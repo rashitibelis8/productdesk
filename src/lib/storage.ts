@@ -1,6 +1,7 @@
 import { mkdir, writeFile, unlink } from 'fs/promises';
 import path from 'path';
 import { randomUUID } from 'crypto';
+import { put, del } from '@vercel/blob';
 import { ALLOWED_IMAGE_TYPES, MAX_UPLOAD_SIZE_BYTES, MAX_UPLOAD_SIZE_MB } from '@/lib/upload-constants';
 
 const EXT_BY_MIME: Record<string, string> = {
@@ -53,4 +54,36 @@ class LocalDiskImageStorage implements ImageStorage {
   }
 }
 
-export const imageStorage: ImageStorage = new LocalDiskImageStorage();
+class VercelBlobImageStorage implements ImageStorage {
+  async saveProductImage(userId: string, file: File): Promise<string> {
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      throw new Error('Invalid image format. Allowed: JPEG, PNG, WEBP, GIF.');
+    }
+    if (file.size > MAX_UPLOAD_SIZE_BYTES) {
+      throw new Error(`Image too large. Max size is ${MAX_UPLOAD_SIZE_MB}MB.`);
+    }
+
+    const ext = EXT_BY_MIME[file.type] ?? 'jpg';
+    const fileName = `${randomUUID()}.${ext}`;
+
+    const blob = await put(`uploads/${userId}/${fileName}`, file, {
+      access: 'public',
+      contentType: file.type,
+    });
+
+    return blob.url;
+  }
+
+  async deleteProductImage(url: string): Promise<void> {
+    if (!url) return;
+    try {
+      await del(url);
+    } catch {
+      // ignore missing files
+    }
+  }
+}
+
+export const imageStorage: ImageStorage = process.env.BLOB_READ_WRITE_TOKEN
+  ? new VercelBlobImageStorage()
+  : new LocalDiskImageStorage();
