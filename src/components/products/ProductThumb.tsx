@@ -4,14 +4,12 @@ import { Icon } from '@/components/ui/Icon';
 export function ProductThumb({ imageUrl, name, size = 40 }: { imageUrl: string | null; name: string; size?: number }) {
   if (imageUrl) {
     return (
-      <Image
-        src={imageUrl}
-        alt={name}
-        width={size}
-        height={size}
-        className="rounded border border-outline-variant object-cover dark:border-outline"
+      <div
+        className="relative shrink-0 overflow-hidden rounded border border-outline-variant bg-surface-container-lowest dark:border-outline dark:bg-inverse-surface"
         style={{ width: size, height: size }}
-      />
+      >
+        <Image src={imageUrl} alt={name} fill sizes={`${size}px`} className="object-contain" />
+      </div>
     );
   }
 
