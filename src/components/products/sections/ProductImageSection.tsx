@@ -58,7 +58,7 @@ export function ProductImageSection({ value, onChange, disabled, compact }: Prod
       {value ? (
         <div className="space-y-3">
           <div className="relative h-48 w-full overflow-hidden rounded-xl border border-outline-variant dark:border-outline">
-            <Image src={value} alt="Product" fill sizes="(min-width: 1024px) 350px, 100vw" className="object-cover" />
+            <Image src={value} alt="Product" fill sizes="(min-width: 1024px) 350px, 100vw" className="object-contain" />
           </div>
           <div className="flex gap-2">
             <button

@@ -69,7 +69,7 @@ export default async function ProductDetailsPage({ params }: { params: { id: str
               alt={product.name}
               fill
               sizes="(min-width: 1024px) 55vw, 100vw"
-              className="object-cover"
+              className="object-contain"
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center">
